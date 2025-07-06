@@ -5,6 +5,25 @@ import sys
 from urllib.parse import urljoin
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+
+# Configure a requests session with a browser-like User-Agent and retries
+session = requests.Session()
+session.headers.update(
+    {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/122.0.0.0 Safari/537.36"
+        )
+    }
+)
+retry = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504, 403])
+adapter = HTTPAdapter(max_retries=retry)
+session.mount("http://", adapter)
+session.mount("https://", adapter)
 from bs4 import BeautifulSoup
 
 try:
@@ -30,7 +49,7 @@ def translate(text: str, translator) -> str:
 
 def extract_recipe_links(start_url: str) -> list[str]:
     """Example function to extract recipe links from start_url."""
-    response = requests.get(start_url)
+    response = session.get(start_url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
     links = []
@@ -43,7 +62,7 @@ def extract_recipe_links(start_url: str) -> list[str]:
 
 def parse_recipe(url: str) -> dict:
     """Parse a recipe page. This function may need adjustments per site."""
-    response = requests.get(url)
+    response = session.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
