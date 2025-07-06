@@ -1,38 +1,53 @@
 # recipies_csv_creater
-# Recipe Scraper
+# Скрейпер рецептов
 
-This project provides scripts to scrape recipes from a web site into a CSV file
-and download recipe photos.
+Набор скриптов — собираем рецепты с сайта в CSV-файл и скачиваем фотографии блюд.
 
-## Requirements
+## Требования
 
-Install dependencies:
+Установите зависимости:
 
 ```bash
 pip install -r requirements.txt
-```
+````
 
-Set the `DEEPL_API_KEY` environment variable if you want automatic translation
-using the DeepL API.
+Для автоматического перевода с помощью DeepL задайте переменную окружения
+`DEEPL_API_KEY`.
 
-## Usage
+Если целевой сайт отвечает ошибкой **403 Forbidden**, скрейпер отправляет
+запросы с заголовком «как у браузера» и делает повторные попытки. Поведение
+можно изменить в файле `scrape_recipes.py`, поправив настройки объекта
+`session`.
 
-### Scrape Recipes
+## Запуск
+
+### Сбор рецептов
 
 ```bash
 python scrape_recipes.py <START_URL> [OUTPUT_DIR]
 ```
 
-The script will crawl the given `START_URL`, collect recipe information and
-store it in `OUTPUT_DIR` (default `output`). For each recipe it creates text
-files containing photo URLs, ingredients and steps. The main data is saved to
-`recipes.csv`.
+* `START_URL` — стартовая страница для обхода (обязательный аргумент).
+* `OUTPUT_DIR` — каталог, куда складывать результаты (по умолчанию `output`).
 
-### Download Images
+Скрипт проходит по ссылкам, собирает данные и создаёт:
+
+* `recipes.csv` — таблица с основной информацией;
+* `text/<slug>_photos.txt` — ссылки на фотографии;
+* `text/<slug>_ingredients.txt` — ингредиенты;
+* `text/<slug>_steps.txt` — пошаговое описание.
+
+### Скачивание изображений
 
 ```bash
 python download_images.py <TXT_DIR> [IMAGES_DIR]
 ```
 
-Reads `*_photos.txt` files from `TXT_DIR` and downloads all images into
-`IMAGES_DIR` (default `images`).
+* `TXT_DIR` — папка с файлами `*_photos.txt` (по умолчанию `text`);
+* `IMAGES_DIR` — куда сохранять картинки (по умолчанию `images`).
+
+Скрипт читает ссылки из `*_photos.txt` и скачивает все изображения в
+`IMAGES_DIR`.
+
+```
+```
